@@ -1,5 +1,10 @@
 # my
-
+  my库是我自己封装一个简单的c++库,其中很多c++的技巧和有意思或者缺陷我都以我自己的理解将他们封装好了.
+## 使用如下
+  直接将代码复制到你的项目即可.
+  #include<my.hpp>
+  就可以包含所有想要的功能
+# 协议
 The MIT License (MIT)
 Copyright © 2019 <copyright holders>
 
