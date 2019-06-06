@@ -26,8 +26,10 @@ namespace my{
 	using elementRef=info_ref_t<ElementType>;
 	using elementConstRef=info_constRef_t<ElementType>;
 
+	using nodePtr=info_ptr_t<listNode>;
+	
 	elementType mValue;
-	hwPtr<listNode> mNext;
+	nodePtr mNext;
 
 	listNode & operator=(const elementType & et){
 	    mValue=et;
@@ -54,9 +56,11 @@ namespace my{
 	using elementRef=info_ref_t<ElementType>;
 	using elementConstRef=info_constRef_t<ElementType>;
 
+	using nodePtr=info_ptr_t<listNode>;
+	
 	elementType mValue;
-	hwPtr<listNode> mNext;
-	hwPtr<listNode> mBack;
+	nodePtr mNext;
+        nodePtr mBack;
 
 	listNode & operator=(const elementType & et){
 	    mValue=et;

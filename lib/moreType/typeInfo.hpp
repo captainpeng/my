@@ -15,7 +15,8 @@
 
 namespace my {
     
-    //类型信息集合体
+    // 类型信息集合体
+    // 非常简单的封装而已
     template<typename T>
     class typeInfo{
     public:
@@ -31,7 +32,6 @@ namespace my {
 	
     };
 
-    
     template<>
     class typeInfo<void>{
     public:
@@ -39,6 +39,12 @@ namespace my {
 	using ptr=void *;
     };
 
+    template<>
+    class typeInfo<std::nullptr_t>{
+    public:
+	using type=std::nullptr_t;
+    };
+	
     //帮助类型
     template<typename T>
     using info_type_t=typename typeInfo<T>::type;

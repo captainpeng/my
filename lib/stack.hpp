@@ -47,39 +47,43 @@ namespace my{
 	}
 
 	inline elementRef operator[](const int i){
-	    return i > size()?top():mBuf[i];
+	    return bufferType::index(i,mBuf.begin(),mBuf.begin()+mHead+1);
 	}
 
 	inline elementConstRef operator[](const int i) const {
-	    return i > size()?top():mBuf[i];
+	    return bufferType::index(i,mBuf.begin(),mBuf.begin()+mHead+1);
 	}
 	
-	inline elementType & top(){
+	inline elementRef top(){
 	    return (mHead == -1)?*nil<elementType>():mBuf[mHead];
 	}
 
-	elementType & pop(){
+	elementType pop(){
 	    if(mHead == -1) return *nil<elementType>();
 
-	    elementPtr tmp=&mBuf[mHead];
+	    elementType tmp=std::move(mBuf[mHead]);
 	    --mHead;
 	    return tmp;
 	}
 
 	bool push(const elementType & et){
-	    if(mHead == mBuf.size()-1 && mBuf.size() < 0x1000){
-		mBuf.resize(mBuf.size()+0x20);
-	    }else return false;
+	    if(mHead == mBuf.size()-1){
+		if(mBuf.size() < 0x1000)
+		    mBuf.resize(mBuf.size()+0x20);
+		else return false;
+	    }
 
 	    mBuf[++mHead]=et;
 	    return true;
 	}
 
 	bool push(elementType && et){
-	    if(mHead == mBuf.size()-1 && mBuf.size() < 0x1000){
-		mBuf.resize(mBuf.size()+0x20);
-	    }else return false;
-
+	    if(mHead == mBuf.size()-1){
+		if(mBuf.size() < 0x1000)
+		    mBuf.resize(mBuf.size()+0x20);
+		else return false;
+	    }
+	    
 	    mBuf[++mHead]=std::move(et);
 	    return true;
 

@@ -129,8 +129,8 @@ namespace my{
 	}
 
 	elementType & operator[](const std::ptrdiff_t i){
-	    i=intLib<int>::abs(i);
-	    return mValue[i];
+	    std::ptrdiff_t pos=intLib<std::ptrdiff_t>::abs(i);
+	    return mValue[pos];
 	}
 	
 	void swap(const hwPtr & p){

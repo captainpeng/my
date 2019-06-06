@@ -11,124 +11,198 @@
 
 #include"mystd.hpp"
 #include"listNode.hpp"
+#include"stack.hpp"
 
 namespace my{
-
-    template<typename ElementType,int PtrNum>
-    class list;
     
-    template<typename ElementType>
-    class list<ElementType,1>{
+    template<typename ElementType,int PtrNum>
+    class list{
     public:
 	using elementType=info_type_t<ElementType>;
 	using elementPtr=info_ptr_t<ElementType>;
 	using elementRef=info_ref_t<ElementType>;
 	using elementConstRef=info_constRef_t<ElementType>;
-
-	using nodeType=listNode<elementType,1>;
-	using nodePtr=hwPtr<nodeType>;
+	using elementMove=info_move_t<ElementType>;
 	
+	using nodeType=listNode<elementType,PtrNum>;
+	using nodePtr=info_ptr_t<nodeType>;
+	using nodePPtr=info_ptr_t<nodePtr>;
+
+	using memType=memory<nodeType>;
     private:
 	nodePtr mHead;
+	int mSize;
 	
-	nodePtr findForward(const elementType & et){
-	    nodePtr tmp=mHead;
-	    while(tmp != nullptr){
-		if((*(*tmp).mNext).mValue == et)
+	nodePPtr findForward(const elementType & et){
+	    nodePPtr tmp=&mHead;
+	    while(*tmp != nullptr){
+		if((*tmp)->mValue == et){
 		    return tmp;
-		tmp=(*tmp).mNext;
+		}
+		tmp=&(*tmp)->mNext;
 	    }
 	    return tmp;
 	}
 
-	nodePtr findForwardByPos(const int pos){
-	    int p=intLib<int>::abs(pos);
-	    
-	    nodePtr tmp=mHead;
-	    for(int i=0;i < p-1 && (*tmp).mNext != nullptr;++i)
-		tmp=(*tmp).mNext;
+	nodePPtr findForwardByPos(const int pos){
+	    // int p=intLib<int>::abs(pos);
+
+	    nodePPtr tmp=&mHead;
+	    for(int i=0;i < pos && *tmp != nullptr;++i)
+		tmp=&(*tmp)->mNext;
 	    
 	    return tmp;
 	}
 
+	// 分配内存块并插入当前的位置
+	// 函数执行后，若无异常，则 *p 则是当前新分配的 node
+	inline void AllocAndInsert(nodePPtr p,int2type<1>){
+	    nodePtr tmpnode;
+	    memType::alloc(&tmpnode);
+	    memType::exchange(&tmpnode->mNext,p);
+	    memType::exchange(&tmpnode,p);
+	    ++mSize;
+ 	}
+
+	inline void AllocAndInsert(nodePPtr p,int2type<2>){
+	    nodePtr tmpnode;
+	    memType::alloc(&tmpnode);
+	    if(*p != nullptr){
+		tmpnode->mBack=(*p)->mBack;
+		(*p)->mBack=tmpnode;
+	    }else{
+		tmpnode->mBack=nullptr;
+	    }
+	    memType::exchange(&tmpnode->mNext,p);
+	    memType::exchange(&tmpnode,p);
+	    ++mSize;
+	}
+
+	// 删掉 node 并释放内存块
+	inline void EraseAndFree(nodePPtr p,int2type<1>){
+	    if(*p != nullptr){
+		nodePtr tmpnode;
+		memType::exchange(&tmpnode,p);
+		memType::exchange(&(tmpnode->mNext),p);
+		memType::free(&tmpnode);
+		--mSize;
+	    }
+
+	}
+
+	inline void EraseAndFree(nodePPtr p,int2type<2>){
+	    if(*p != nullptr){
+		nodePtr tmpnode;
+		memType::exchange(&tmpnode,p);
+		memType::exchange(&(tmpnode->mNext),p);
+
+		if(*p != nullptr){
+		    (*p)->mBack=tmpnode->mBack;
+		}
+
+		memType::free(&tmpnode);
+		--mSize;
+	    }
+	}
 	
     public:
-	list():mHead(nil<nodeType>()){}
-	void insert(const elementType & et){
-	    if(mHead == nullptr){
-		mHead.alloc();
-		(*mHead)=et;
-		return ;
+	list():mHead(nullptr),mSize(0){}
+
+	~list(){
+	    clear();
+	}
+	
+	int size(){
+	    return mSize;
+	}
+	
+	void insert(elementConstRef et){
+	    AllocAndInsert(&mHead,int2type<PtrNum>());
+	    mHead->mValue=et;
+	}
+
+	void insert(elementMove et){
+	    AllocAndInsert(&mHead,int2type<PtrNum>());
+	    mHead->mValue=std::move(et);
+	}
+	
+	void insert(elementConstRef et,const int pos){
+	    nodePPtr tmp=findForwardByPos(pos);
+	    AllocAndInsert(tmp,int2type<PtrNum>());
+	    (*tmp)->mValue=et;
+	}
+
+	void insert(nodePtr p,elementConstRef et){
+	    if(p == nullptr) return ;
+	    
+	    AllocAndInsert(&(p->mNext),int2type<PtrNum>());
+	}
+
+	bool exist(nodePtr p){
+	    nodePtr tmp=mHead;
+	    while(tmp != nullptr){
+		if(tmp == p)
+		    return true;
+		tmp=tmp->mNext;
 	    }
-
-	    insert(mHead,et);
+	    return false;
 	}
-
-	void insert(const elementType & et,const int pos){
-	    if(pos == 0){
-		nodePtr tmp=std::move(mHead);
-		mHead.alloc();
-		(*mHead)=et;
-		(*mHead).mNext=std::move(tmp);
-	    }else{
-		std::cout<<"hhh"<<std::endl;
-		nodePtr tmp1=findForwardByPos(pos);
-		std::cout<<"bool: "<<tmp1.isPower()<<std::endl;
-		insert(tmp1,et);
-	    }
-	}
-
-	void insert(nodePtr p,const elementType & et){
-	    nodePtr tmp;
-	    tmp.alloc();
-	    (*tmp)=et;
-
-	    // std::cout<<static_cast<void*>(&tmp.mValue)<<std::endl;
-	    // std::cout<<"bool: "<<tmp.isPower()<<std::endl;
-	    // std::swap((*tmp).mNext,(*p).mNext);
-	    tmp=(*tmp).mNext=std::move(tmp);
-
-	    // std::cout<<"bool: "<<(*tmp).mNext.isPower()<<std::endl
-	    // 	     <<"bool: "<<(*p).mNext.isPower()<<std::endl
-	    // 	     <<"bool: "<<tmp.isPower()<<std::endl;
-	    (*p).mNext.swap((*tmp).mNext);
-	    // std::cout<<static_cast<void*>(&((*tmp).mNext).mValue)<<std::endl;
-	    // std::cout<<static_cast<void*>(&(*p).mNext.mValue)<<std::endl;
-	}
-
-	elementRef find(const elementType & et){
-	    return (*(*findForward(et)).mNext).mValue;
+	
+	elementRef find(elementConstRef et){
+	    return (*findForward(et))->mValue;
 	}
 
 	elementRef findByPos(int pos){
-	    return (*(*findForwardByPos(pos)).mNext).mValue;
+	    return (*findForwardByPos(pos))->mValue;
 	}
 	
-	void erase(const elementType & et){
-	    nodePtr tmp1=findForward(et);
-	    nodePtr tmp2=(*tmp1).mNext;
-	    std::swap((*tmp1).mNext,(*(*tmp1).mNext).mNext);
-	    tmp2=std::move(tmp2.mNext);
+	void erase(elementConstRef et){
+	    nodePPtr tmp=findForward(et);
+	    EraseAndFree(tmp,int2type<PtrNum>());
 	}
 
-	void show(){
-	    nodePtr tmp=mHead;
-	    std::cout<<"[ ";
-	    while(true){
-		std::cout<<(*tmp).mValue;
-		if((*tmp).mNext == nullptr){
-		    std::cout<<" ]"<<std::endl;
-		    break;
-		}else{
-		    std::cout<<",";
-		}
-		tmp=(*tmp).mNext;
+	void clear(){
+	    nodePPtr tmp=&mHead;
+	    stack<nodePPtr> s(mSize);
+	    while(*tmp != nullptr){
+		s.push(tmp);
+		tmp=&(*tmp)->mNext;
+ 	    }
+	    
+	    // std::cout<<"statck capacity = "<<s.capacity()<<std::endl;
+	    while(!s.empty()){
+		memType::free(s.pop());
 	    }
+
+	    mHead=nullptr;
+	    mSize=0;
+	}
+	
+	void show(std::ostream & os=std::cout) const {
+	    nodePtr tmp=mHead;
+	    os<<"{";
+	    while(tmp != nullptr){
+		os<<tmp->mValue;
+		if(tmp->mNext != nullptr)
+		    os<<',';
+		tmp=tmp->mNext;
+	    }
+	    os<<"}";
 	}
     };
 
+    template<typename Type,int Value>
+    std::ostream & operator<<(std::ostream & os,const list<Type,Value> l){
+	l.show(os);
+	return os;
+    }
+    
     template<typename T>
-    using singleList=list<T,1>;
+    using slist=list<T,1>;
+
+    template<typename T>
+    using dlist=list<T,2>;
+    
 }
 
 #endif

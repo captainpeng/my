@@ -75,9 +75,8 @@ namespace my{
 	}
 	
     public:
-	unSeq(int len=0):mBuf(digitLib<int>::abs(len))
-	{}
-
+	unSeq(){}
+	
 	elementRef at(int index){
 	    if(mBuf.size() != 0){
 		// i 存在的意义也是大概定位，如findAddPos
@@ -101,10 +100,22 @@ namespace my{
 	    return at(index);
 	}
 
-	void add(const std::initializer_list<int> indexList){
+	void add(const std::initializer_list<int> & indexList,
+		 const std::initializer_list<elementType> & etList){
+	    auto it1=indexList.begin();
+	    auto eit1=indexList.end();
+	    auto it2=etList.begin();
+	    auto eit2=etList.begin();
+
+	    while(it1 != eit1 && it2 != eit2){
+		add(*it1,std::move(*it2));
+	    }
+	}
+	
+	void add(const std::initializer_list<int> & indexList,elementConstRef et=*nil<elementType>){
 	    for(auto it=indexList.begin(),itEnd=indexList.end();
 		it != itEnd; ++it)
-		add((*it));
+		add((*it),et);
 	}
 	
 	elementRef add(const int index,elementConstRef et=*nil<elementType>()){

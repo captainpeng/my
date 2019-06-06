@@ -53,7 +53,7 @@ namespace my{
 		mCurEnd=mBuf.begin()+i+1;
 	    }
 
-	    return bufType::index(mBuf,pos,mBuf.begin(),mCurEnd);
+	    return bufType::index(pos,mBuf.begin(),mCurEnd);
 	}
 
 	// elementRef index(const int pos,){
@@ -76,7 +76,7 @@ namespace my{
 	// }
 	
     public:
-	seq():mBuf(),mCurEnd(nil<elementType>){}
+	seq():mBuf(),mCurEnd(nil<elementType>()){}
 
 	seq(int length):mBuf(length),mCurEnd(mBuf.end()){}
 	
@@ -94,18 +94,32 @@ namespace my{
 	seq(const bufType & buf,int size):mBuf(buf),mCurEnd(mBuf.begin()+size){}
 	seq(const bufType && buf,int size):mBuf(std::move(buf)),mCurEnd(mBuf.begin()+size){}
 	
-	seq(const std::initializer_list<elementType> list):mBuf(list),mCurEnd(mBuf.end()){}
+	seq(const std::initializer_list<elementType> & list):mBuf(list),mCurEnd(mBuf.end()){}
 
 	seq & operator=(const seq & s){
 	    mBuf=s.mBuf;
 	    mCurEnd=mBuf.end()-(s.mBuf.end()-s.mCurEnd);
+	    return *this;
 	}
 
-	seq & operator=(const seq && s){
+	seq & operator=(seq && s){
 	    mBuf=std::move(s.mBuf);
-	    mCurEnd=std::move(s.mCurEnd);
+	    mCurEnd=s.mCurEnd;
+	    s.mCurEnd=nil<elementType>();
+	    return *this;
 	}
 
+	seq & operator=(const std::initializer_list<elementType> & list){
+	    if(mBuf.size() >= list.size()){
+		for(auto it=list.begin(),eit=list.end(),i=0;it != eit;++it,++i){
+		    mBuf[i]=std::move(*it);
+		}
+		mCurEnd=mBuf.begin()+list.size();
+	    }else
+		mBuf=list;
+	    return *this;
+	}
+	
 	inline int size() const {
 	    return mCurEnd-mBuf.begin();
 	}
@@ -150,8 +164,8 @@ namespace my{
 	    // if(i >= size())
 	    // 	return *nil<elementType>();
 	    // return mBuf[pos];
-
-	    return bufType::index(mBuf,pos,mBuf.begin(),mCurEnd);
+	    seq & tmp=const_cast<seq & >(*this);
+	    return bufType::index(tmp.mBuf,pos,tmp.mBuf.begin(),tmp.mCurEnd);
 	}
 
 	inline elementRef operator*(){
@@ -309,7 +323,7 @@ namespace my{
 	}
 
 	// std::cout<<flag<<','<<cflag<<std::endl;
-	flag = flag || cflag && lhs.size() > rhs.size();
+	flag = flag || (cflag && lhs.size() > rhs.size());
 	return flag;
     }
 
@@ -331,10 +345,13 @@ namespace my{
     template<typename ElementType>
     std::ostream & operator<<(std::ostream & os,const seq<ElementType> & rhs){
 	os<<'{';
-	for(auto it=rhs.begin();it != rhs.end()-1;++it){
-	    os<<(*it)<<',';
+	for(auto it=rhs.begin();it != rhs.end();++it){
+	    if(it == rhs.end()-1)
+		os<<(*it);
+	    else
+		os<<(*it)<<',';
 	}
-	return os<<(*(rhs.end()-1))<<'}';
+	return os<<'}';
     }
 }
 #endif

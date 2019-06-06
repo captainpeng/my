@@ -30,8 +30,8 @@ namespace my {
 	// using elementConstPtr=typename my::typeInfo<ElementType>::constPtr;
 	// using elementRef=typename my::typeInfo<ElementType>::ref;
 	// using elementConstRef=typename my::typeInfo<ElementType>::constRef;
-
-	using elementType=info_type_t<ElementType>;
+	
+        using elementType=info_type_t<ElementType>;
 	using elementPtr=info_ptr_t<ElementType>;
 	using elementRef=info_ref_t<ElementType>;
 	using elementConstRef=info_constRef_t<ElementType>;
@@ -69,7 +69,7 @@ namespace my {
 		theAlloc().deallocate(p,s);
 	    }
 	}
-	
+			
 	elementRef get(const int pos) const {
 	    int i=pos;
             // default the pos within the scope
@@ -77,7 +77,7 @@ namespace my {
 	    elementPtr tmp=mBegin;
             // default is will start for mBegin
 	
-	    if(pos>=ssize()&&pos<size()) // check the pos
+	    if(pos >= ssize() && pos < size()) // check the pos
 		tmp=(pos>=0)?mBegin:mEnd;
 	    // if pos is within the scope and check the ptr tmp
 	    else
@@ -101,18 +101,23 @@ namespace my {
 
     public:
 	// 通用的 index 函数，可任意设置范围，但要求 begin 和 end 指针是 buf 中的一部分
-	static inline elementRef index(buffer & buf,const int pos,elementPtr begin,elementPtr end){
+	static inline elementRef index(const int pos,elementPtr begin,elementPtr end){
+	    if(begin >= end) return *nil<elementType>();
+	    
+	    int size=end-begin;
+	    int ssize=begin-end;
+	    
 	    int i=pos;
             // default the pos within the scope
 
 	    elementPtr tmp=begin;
             // default is will start for mBegin
 	
-	    if(pos>=buf.ssize() && pos<buf.size()) // check the pos
-		tmp=(pos>=0)?tmp:end;
+	    if(pos >= ssize && pos < size) // check the pos
+		tmp=(pos >= 0)?tmp:end;
 	    // if pos is within the scope and check the ptr tmp
 	    else
-		i=(pos>0)?buf.size()-1:0;
+		i=(pos > 0)?size-1:0;
 	    // if pos isn't within the scope and check the var i
 
 	    return *(tmp+i);
@@ -127,8 +132,9 @@ namespace my {
 	    mEnd(mBegin)
 	    {}
 
-	buffer(int length){
-	    int len=digitLib<int>::abs(length);
+	buffer(int length){	    
+	    // int len=digitLib<int>::abs(length);
+	    int len=(length < 0)?0:length;
 	    // mBegin=new elementType[len]; 
 	    memType::alloc(&mBegin,len);
 	    mEnd=mBegin+len;
@@ -146,17 +152,14 @@ namespace my {
 		buff.mEnd=buff.mBegin=nil<elementType>();
 	}
 
-	buffer(const std::initializer_list<elementType> list){
+	buffer(const std::initializer_list<elementType> & list){
 		using ptr_type=typename std::initializer_list<elementType>::iterator;
 
 		memType::alloc(&mBegin,list.size());
 		mEnd=mBegin+list.size();
-		
-		ptr_type head=list.begin();
-		//in c++_11/14/17,ptr_type == const T *
-	    
-		for(int i=0;i<list.size();++i)
-		    mBegin[i]=head[i];
+			    
+		for(auto it=list.begin(),eit=list.end(),i=0;it != eit;++it,++i)
+		    mBegin[i]=std::move(*it);
 
 	}
     
@@ -189,12 +192,21 @@ namespace my {
 	    return *this;
 	}
 
+	buffer & operator=(const std::initializer_list<elementType> & list){
+	    memType::alloc(&mBegin,list.size());
+	    mEnd=mBegin+list.size();
+	    
+	    for(auto it=list.begin(),eit=list.end(),i=0;it != eit;++it,++i){
+		mBegin[i]=std::move(*it);
+	    }
+	    return *this;
+	}
+	
 	~buffer(){
 	    this->free();
 	}
 
 	void alloc(int len){
-	    this->free();
 	    memType::alloc(&mBegin,len);
 	    mEnd=mBegin+len;
 	}
@@ -204,6 +216,10 @@ namespace my {
 		memType::free(&mBegin);
 		mEnd=nil<elementType>();
 	    }
+	}
+
+	inline void clear(){
+	    free();
 	}
 	
 	inline int size() const {
@@ -295,9 +311,9 @@ namespace my {
     std::ostream & operator<<(std::ostream & os,const buffer<ElementType> & buffer){
 	os<<"{ ";
 	for(int i=0;i < buffer.size()-1;++i)
-		os<<buffer[i]<<", ";
-	
-	return os<<(*(buffer.end()-1))<<" }";
+	    os<<buffer[i]<<", ";
+				
+	return os<<*(buffer.end()-1)<<" }";
     }
 }
 #endif

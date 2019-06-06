@@ -2,11 +2,12 @@
 #define my_hpp
 
 #include"mystd.hpp"
+#include"error.hpp"
 #include"buffer.hpp"
 #include"unSeq.hpp"
+#include"stack.hpp"
 #include"list.hpp"
 #include"seq.hpp"
-#include"stack.hpp"
-#include"error.hpp"
+
 
 #endif

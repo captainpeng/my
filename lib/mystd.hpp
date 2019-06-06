@@ -18,13 +18,12 @@
 #include<vector>
 #include<string>
 
+#include"stdint.hpp"
 #include"nil.hpp"
 #include"typeLib.hpp"
 #include"digitLib.hpp"
 #include"intLib.hpp"
 #include"charLib.hpp"
-
-#include"memory.hpp"
-
+#include"flag.hpp"
 
 #endif

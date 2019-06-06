@@ -14,5 +14,6 @@
 #include"moreType/typeIs.hpp"
 #include"moreType/typePrint.hpp"
 #include"moreType/typeEnable.hpp"
+#include"moreType/typeGen.hpp"
 
 #endif

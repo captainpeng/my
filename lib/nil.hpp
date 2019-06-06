@@ -42,7 +42,8 @@ namespace my {
 	static const bool value=true;
     
 	T * operator()(){
-	    static T nil_value=theNil<element_type>();
+	    // theNil<element_type> func;
+	    static T nil_value=theNil<element_type>()();
 	    return & nil_value;
 	}
     };

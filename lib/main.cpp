@@ -4,8 +4,11 @@
 #include<algorithm>
 #include<string>
 #include<vector>
+#include<sstream>
+#include<fstream>
 
 #include"mystd.hpp"
+#include"memory.hpp"
 #include"buffer.hpp"
 
 #include"unSeq.hpp"
@@ -17,6 +20,12 @@
 
 #include"seq.hpp"
 
+#include"error.hpp"
+
+template<typename T,typename Enable=my::enable_wc_char_t<T>>
+class test{
+    
+};
 int main(){
     using namespace std;
     using namespace my;
@@ -174,12 +183,209 @@ int main(){
     // std::cout<<((a1 > a4)?"true":"false")<<std::endl;
     // std::cout<<((a4 > a1)?"true":"false")<<std::endl;
 
-    for(int i=0;i < 1000;++i){
-	if(intLib<int>::isPrime(i)){
-	    std::cout<<i<<',';
-	};
-    }
+    // for(int i=0;i < 1000;++i){
+    // 	if(intLib<int>::isPrime(i)){
+    // 	    std::cout<<i<<',';
+    // 	};
+    // }
 
-    std::cout<<"nextPrime="<<intLib<int>::nextPrime(100)<<std::endl;
+    // std::cout<<"nextPrime="<<intLib<int>::nextPrime(100)<<std::endl;
+    // using nodePtr=typename memList::nodePtr;
+    // int a;
+    // int b;
+    // int c;
+    
+    // memList<int> l;
+    // l.insert(static_cast<void *>(&c),static_cast<void *>(&c),sizeof(int));
+    
+    
+    // nodePtr p=l.head();
+    // while(p != nullptr){
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+    // 	p=p->mNext;
+    // }
+
+    // std::cout<<std::endl;
+    // l.insert(static_cast<void *>(&a),static_cast<void *>(&a),sizeof(int));
+    // p=l.head();
+    // while(p != nullptr){
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+    // 	p=p->mNext;
+    // }
+    
+    // std::cout<<std::endl;
+    // l.insert(static_cast<void *>(&b),static_cast<void *>(&b),sizeof(int));
+    // p=l.head();
+    // while(p != nullptr){
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+    // 	p=p->mNext;
+    // }
+
+    // std::cout<<std::endl;
+    // l.insert(static_cast<void *>(&b),static_cast<void *>(&b),sizeof(long));
+    // p=l.head();
+    // while(p != nullptr){
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+    // 	p=p->mNext;
+    // }
+
+    // std::cout<<std::endl;
+    // p=l.findPower(&a);
+    // if(p != nullptr)
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+
+    // std::cout<<std::endl;
+    // p=l.find(&b);
+    // if(p != nullptr)
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+
+    // std::cout<<std::endl;
+    // l.erase(static_cast<void *>(&b));
+    // p=l.head();
+    // while(p != nullptr){
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+    // 	p=p->mNext;
+    // }
+
+    // int d[20];
+    // std::cout<<std::endl;
+    // l.insert(static_cast<void *>(d),static_cast<void *>(d),sizeof(int)*20);
+    // p=l.head();
+    // while(p != nullptr){
+    // 	std::cout<<p->mValue<<","<<p->mPower<<","<<p->mSize<<std::endl;
+    // 	p=p->mNext;
+    // }
+
+    // std::cout<<std::endl;
+    // if(l.exist(static_cast<void *>(&d[2])))
+    //    std::cout<<static_cast<void *>(&d[2])<<" exit."<<std::endl;
+
+    // if(l.exist(static_cast<void *>(&d[21])))
+    //    std::cout<<static_cast<void *>(&d[21])<<" exit."<<std::endl;
+
+    // if(l.exist(static_cast<void *>(&d[0])))
+    //    std::cout<<static_cast<void *>(&d[0])<<" exit."<<std::endl;
+  
+    // std::pair<int,int> e;
+    // std::cout<<std::endl;
+    // l.insert(static_cast<void *>(&e),static_cast<void *>(&e),sizeof(std::pair<int,int>));
+    // if(l.exist(static_cast<void *>(&e.first)))
+    // 	std::cout<<static_cast<void *>(&e.first)<<" exit."<<std::endl;
+    
+    // if(l.exist(static_cast<void *>(&e.second)))
+    // 	std::cout<<static_cast<void *>(&e.second)<<" exit."<<std::endl;
+
+    using manType=memMan;
+    // buffer<int> a(10);
+    // manType::ShowList();
+    // std::cout<<"--------------"<<std::endl;
+    // a.alloc(20);
+    // manType::ShowList();
+    // std::cout<<"--------------"<<std::endl;
+    // buffer<int> b(std::move(a));
+    // manType::ShowList();
+    // std::cout<<"--------------"<<std::endl;
+    // std::cout<<a.size()<<' '<<b.size()<<std::endl;
+
+    // {
+    // 	buffer<int> c(20);
+    // 	manType::ShowList();
+    // 	std::cout<<"--------------"<<std::endl;
+    // }
+
+    // std::pair<int,int> * p;
+    // memory<std::pair<int,int>>::alloc(&p,1);
+    // int * p1=&p->first;
+    // memory<int>::plusCount(p1);
+    // manType::ShowList();
+    // std::cout<<"--------------"<<std::endl;
+    // std::cout<<static_cast<void *>(p1)<<std::endl;	
+    // if(memory<int>::exist(p1)){
+    // 	std::cout<<"exist"<<std::endl;
+    // }else{
+    // 	std::cout<<"don't exist"<<std::endl;
+    // }
+
+    // int * intp;
+    // memory<int>::alloc(&intp,1);
+    // memory<std::pair<int,int>>::free(&p);
+
+    // manType::ShowList();
+    // std::cout<<"--------------"<<std::endl;
+    // std::cout<<static_cast<void *>(p1)<<std::endl;	
+    // if(memory<int>::exist(p1)){
+    // 	std::cout<<"exist"<<std::endl;
+    // }else{
+    // 	std::cout<<"don't exist"<<std::endl;
+    // }
+
+    // memory<int>::minusCount(p1);
+    // manType::ShowList();
+    // std::cout<<"--------------"<<std::endl;
+    // std::cout<<static_cast<void *>(p1)<<std::endl;	
+    // if(memory<int>::exist(p1)){
+    // 	std::cout<<"exist"<<std::endl;
+    // }else{
+    // 	std::cout<<"don't exist"<<std::endl;
+    // }
+
+    // buffer<int> buf{1,2,3,4,5};
+    // std::cout<<buf<<std::endl;
+    // buf={1,2,4,5};
+    // std::cout<<buf<<std::endl;
+    // std::cout<<buf.size()<<std::endl;
+
+    // seq<int> s{1,2,3,4,5};
+    // std::cout<<s<<std::endl;
+    // s={1,2,3};
+    // std::cout<<s.size()<<std::endl;
+    // std::cout<<s.capacity()<<std::endl;
+    // std::cout<<('\0' == L'\0')<<std::endl;
+    // std::FILE * fp=tmpfile();
+    // std::fputws(L"hahahah",fp);
+    // std::rewind(fp);
+    // wchar_t buf[100];
+    // for(int i=0;i < 100;++i)
+    // 	buf[i]=L'a';
+    
+    // std::fgetws(buf,100,fp);
+    // std::cout<<std::wcslen(buf)<<std::endl;
+    // std::cout<<static_cast<int>(buf[std::wcslen(buf)])<<std::endl;
+
+    
+    // std::wistringstream ss(L"fuck");
+    // ss.read(buf,100);
+    // std::cout<<ss.gcount()<<','<<std::wcslen(buf)<<std::endl;
+    // buffer<int> buf{1,2,3,4,5,6};
+    // for(auto it = buf.begin();it != buf.end();++it)
+    // 	std::cout<<*it<<',';
+    // std::cout<<std::endl;
+    // for(int i=0;i < buf.size();++i)
+    // 	std::cout<<buf[i]<<',';
+    // std::cout<<std::endl;
+
+    // for(int i=0;i < buf.size();++i)
+    // 	std::cout<<buffer<int>::index(i,buf.begin(),buf.end())<<',';
+    // std::cout<<std::endl;
+
+    // test<int> a;
+    // print_is_same<int,info_type_t<int>>();
+    // print_is_same<info_ptr_t<int>,int *>();
+    // print_is_same<info_ptr_t<info_ptr_t<int>>,int **>();
+
+    // print_is_same<int const *,int * const>();
+    // print_is_same<const int *,int * const>();
+    // print_is_same<int const *,const int *>();
+
+    // int a;
+    // int const * p1=&a;
+    // const int * p2=&a;
+    // int * const p3=&a;
+
+    // p1=p2;
+    // *p3=3;
+
+    static_assert(false,"ni ma bi");
     return 0;
+    
 }
